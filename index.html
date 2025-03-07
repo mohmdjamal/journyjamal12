@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رحلة النجوم الساقطة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(180deg, #0D1B2A, #1B263B);
+            font-family: 'Cairo', sans-serif;
+            color: #A3BFFA;
+            min-height: 100vh;
+            margin: 0;
+            overflow-y: auto; /* السماح بالتمرير العمودي */
+            position: relative;
+            transition: background 1s ease, color 0s ease; /* تسريع الانتقال */
+            scroll-behavior: smooth; /* تمرير سلس */
+        }
+        .nebula {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(163, 191, 250, 0.2) 0%, transparent 70%);
+            animation: nebulaGlow s infinite ease-in-out; /* تسريع الرسوم المتحركة */
+        }
+        @keyframes nebulaGlow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.05); }
+        }
+        .container {
+            background: rgba(27, 38, 59, 0.9);
+            border-radius: 40px;
+            padding: 3rem;
+            width: 90%;
+            max-width: 850px;
+            box-shadow: 0 0 50px rgba(163, 191, 250, 0.4);
+            border: 3px solid #7289DA;
+            position: relative;
+            z-index: 1;
+            animation: orbitPulse 1s infinite; /* تسريع النبض */
+            box-sizing: border-box;
+            margin: 20px auto; /* هامش لضمان عدم الالتصاق بالحافة */
+        }
+        @keyframes orbitPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(163, 191, 250, 0.4); }
+            50% { box-shadow: 0 0 60px rgba(163, 191, 250, 0.7); }
+        }
+        h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            color: #7289DA;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(114, 137, 218, 0.8);
+            animation: starFlicker 1s infinite; /* تسريع الوميض */
+        }
+        @keyframes starFlicker {
+            0%, 100% { opacity: 1; text-shadow: 0 0 15px rgba(114, 137, 218, 0.8); }
+            50% { opacity: 0.85; text-shadow: 0 0 25px rgba(114, 137, 218, 1); }
+        }
+        .star-field {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem;
+        }
+        .star-input {
+            background: radial-gradient(circle, #2E3440, #1B263B);
+            border: 3px solid #7289DA;
+            border-radius: 50%;
+            width: clamp(60px, 15vw, 90px);
+            height: clamp(60px, 15vw, 90px);
+            text-align: center;
+            color: #D8DEE9;
+            font-size: clamp(1rem, 4vw, 1.75rem);
+            font-weight: bold;
+            transition: transform , border-color , box-shadow 0s; /* تسريع الانتقالات */
+        }
+        .star-input:focus {
+            border-color: #FFD700;
+            transform: scale(1.15);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            outline: none;
+        }
+        button {
+            border-radius: 25px;
+            transition: transform 0s, box-shadow 0s; /* تسريع الانتقالات */
+            font-weight: bold;
+        }
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        #nextBtn {
+            padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1.5rem, 5vw, 2.5rem);
+            background: #7289DA;
+            color: #FFFFFF;
+        }
+        #prevBtn, #resetBtn {
+            padding: clamp(0.2rem, 1vw, 0.25rem) clamp(0.75rem, 2vw, 1rem);
+            background: #FFD700;
+            color: #0D1B2A;
+        }
+        #resetBtn {
+            background: #FF6F61;
+            color: #FFFFFF;
+        }
+        .notification {
+            position: fixed;
+            top: clamp(20px, 5vh, 40px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #FFD700;
+            color: #0D1B2A;
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+            display: none;
+            z-index: 1000;
+            animation: meteorFlash 0.3s ease-out; /* تسريع الإشعار */
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+        @keyframes meteorFlash {
+            0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+            70% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+        .star-logs, .lost-stars {
+            background: rgba(46, 52, 64, 0.85);
+            border-radius: 25px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 2px dashed #7289DA;
+            transition: background 0s ease; /* تسريع الانتقال */
+        }
+        th, td {
+            padding: clamp(0.5rem, 2vw, 1rem);
+            color: #D8DEE9;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+        }
+        th {
+            background: #7289DA;
+        }
+        .mode-toggle {
+            position: fixed;
+            top: clamp(10px, 3vh, 20px);
+            right: clamp(10px, 3vw, 20px);
+            background: #FF6F61;
+            border-radius: 50%;
+            padding: clamp(0.5rem, 2vw, 1rem);
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 111, 97, 0.6);
+            z-index: 1000;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .mode-toggle:hover {
+            background: #FF8A65;
+            transform: rotate(360deg);
+        }
+        .scroll-to-logs {
+            position: fixed;
+            bottom: clamp(10px, 3vh, 20px);
+            right: clamp(10px, 3vw, 20px);
+            background: #7289DA;
+            border-radius: 50%;
+            padding: clamp(0.5rem, 2vw, 1rem);
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(114, 137, 218, 0.6);
+            z-index: 1000;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .scroll-to-logs:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(114, 137, 218, 0.8);
+        }
+
+        /* Media Queries للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            .star-field {
+                gap: 0.5rem;
+            }
+            .star-input {
+                width: clamp(50px, 12vw, 70px);
+                height: clamp(50px, 12vw, 70px);
+            }
+            .flex.justify-center.gap-8 {
+                gap: 1rem;
+                flex-direction: column;
+                align-items: center;
+            }
+            h2 {
+                font-size: clamp(1.2rem, 4vw, 1.5rem);
+            }
+            .star-logs, .lost-stars {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+                border-radius: 20px;
+            }
+            .star-field {
+                gap: 0.3rem;
+            }
+            .notification {
+                padding: 0.75rem 1.5rem;
+                top: clamp(10px, 3vh, 20px);
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="nebula"></div>
+    <div class="notification" id="notification"></div>
+    <button class="mode-toggle" id="modeToggle" onclick="toggleMode()">🌠</button>
+    <button class="scroll-to-logs" onclick="scrollToLogs()">↓</button>
+    <div class="container">
+        <div class="flex justify-end mb-5">
+            <button id="langToggle" class="bg-2E3440 hover:bg-4B5EAA p-2 rounded-full" onclick="toggleLanguage()">
+                <span class="text-xl text-D8DEE9">🪐</span>
+            </button>
+        </div>
+        <h1 id="title">رحلة النجوم الساقطة</h1>
+        <p class="text-2xl mb-5 text-center" id="stageText">المحطة: <span id="stage">1</span></p>
+        <div class="star-field">
+            <input type="number" class="star-input" id="num1" placeholder="★" min="1" max="36">
+            <input type="number" class="star-input" id="num2" placeholder="★" min="1" max="36">
+            <input type="number" class="star-input" id="num3" placeholder="★" min="1" max="36">
+            <input type="number" class="star-input" id="num4" placeholder="★" min="1" max="36">
+            <input type="number" class="star-input" id="num5" placeholder="★" min="1" max="36">
+        </div>
+        <div class="flex justify-center gap-8 mb-6">
+            <button id="nextBtn" onclick="nextStage()">اجمع النجوم</button>
+            <button id="prevBtn" onclick="prevStage()">عد إلى الوراء</button>
+            <button id="resetBtn" onclick="resetGame()">أعد الإقلاع</button>
+        </div>
+        <p class="text-xl text-center text-FFD700 mb-6" id="result"></p>
+
+        <!-- قسم النجوم الضائعة -->
+        <div class="lost-stars">
+            <h2 id="lostStarsTitle" class="text-2xl font-semibold mb-4 text-center">النجوم الضائعة منذ 60 محطة</h2>
+            <p id="lostStars" class="text-center"></p>
+        </div>
+
+        <!-- قسم السجل الفضائي -->
+        <div class="star-logs" id="spaceLog">
+            <h2 id="stageNumbersTitle" class="text-2xl font-semibold mb-4 text-center">السجل الفضائي</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-center">
+                    <thead>
+                        <tr>
+                            <th id="stageCol">المحطة</th>
+                            <th id="numbersCol">النجوم المجمعة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stageNumbers">
+                        <tr><td colspan="2" class="p-2" id="noNumbers">لم تُجمع نجوم بعد</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stage = 1;
+        let stagesData = [];
+        let numberStages = {};
+        let lostStarsDisplayed = {};
+        let isArabic = true;
+        let isDarkMode = true;
+
+        function toggleLanguage() {
+            isArabic = !isArabic;
+            document.documentElement.lang = isArabic ? "ar" : "en";
+            document.documentElement.dir = isArabic ? "rtl" : "ltr";
+
+            document.getElementById("title").textContent = isArabic ? "رحلة النجوم الساقطة" : "Journey of Fallen Stars";
+            document.getElementById("stageText").childNodes[0].textContent = isArabic ? "المحطة: " : "Station: ";
+            document.getElementById("nextBtn").textContent = isArabic ? "اجمع النجوم" : "Collect Stars";
+            document.getElementById("prevBtn").textContent = isArabic ? "عد إلى الوراء" : "Go Back";
+            document.getElementById("resetBtn").textContent = isArabic ? "أعد الإقلاع" : "Relaunch";
+            document.getElementById("stageNumbersTitle").textContent = isArabic ? "السجل الفضائي" : "Space Log";
+            document.getElementById("stageCol").textContent = isArabic ? "المحطة" : "Station";
+            document.getElementById("numbersCol").textContent = isArabic ? "النجوم المجمعة" : "Collected Stars";
+            document.getElementById("noNumbers").textContent = isArabic ? "لم تُجمع نجوم بعد" : "No stars collected yet";
+            document.getElementById("lostStarsTitle").textContent = isArabic ? "النجوم الضائعة منذ 60 محطة" : "Stars Lost for 60 Stations";
+
+            updateStageTable();
+            updateLostStars();
+        }
+
+        function toggleMode() {
+            isDarkMode = !isDarkMode;
+            const body = document.body;
+            const modeToggle = document.getElementById("modeToggle");
+            const container = document.querySelector(".container");
+            const inputs = document.querySelectorAll(".star-input");
+            const table = document.querySelector(".star-logs");
+            const lostStars = document.querySelector(".lost-stars");
+            const allText = document.querySelectorAll("h1, p, th, td, span");
+            const langToggle = document.getElementById("langToggle");
+            const nebula = document.querySelector(".nebula");
+
+            if (isDarkMode) {
+                body.style.background = "linear-gradient(180deg, #0D1B2A, #1B263B)";
+                body.style.color = "#A3BFFA";
+                container.style.background = "rgba(27, 38, 59, 0.9)";
+                container.style.borderColor = "#7289DA";
+                inputs.forEach(input => {
+                    input.style.background = "radial-gradient(circle, #2E3440, #1B263B)";
+                    input.style.color = "#D8DEE9";
+                    input.style.borderColor = "#7289DA";
+                });
+                table.style.background = "rgba(46, 52, 64, 0.85)";
+                lostStars.style.background = "rgba(46, 52, 64, 0.85)";
+                allText.forEach(text => text.style.color = "#D8DEE9");
+                langToggle.style.background = "#2E3440";
+                langToggle.classList.remove("bg-FFB6C1");
+                langToggle.classList.add("bg-2E3440");
+                nebula.style.display = "block";
+                modeToggle.textContent = "🌠";
+            } else {
+                body.style.background = "linear-gradient(180deg, #FFB6C1, #87CEEB)";
+                body.style.color = "#2E3440";
+                container.style.background = "rgba(240, 248, 255, 0.9)";
+                container.style.borderColor = "#FF6F61";
+                inputs.forEach(input => {
+                    input.style.background = "radial-gradient(circle, #87CEEB, #E6F0FA)";
+                    input.style.color = "#2E3440";
+                    input.style.borderColor = "#FF6F61";
+                });
+                table.style.background = "rgba(240, 248, 255, 0.85)";
+                lostStars.style.background = "rgba(240, 248, 255, 0.85)";
+                allText.forEach(text => text.style.color = "#2E3440");
+                langToggle.style.background = "#FFB6C1";
+                langToggle.classList.remove("bg-2E3440");
+                langToggle.classList.add("bg-FFB6C1");
+                nebula.style.display = "none";
+                modeToggle.textContent = "☀️";
+            }
+        }
+
+        function nextStage() {
+            let numbers = [
+                parseInt(document.getElementById("num1").value),
+                parseInt(document.getElementById("num2").value),
+                parseInt(document.getElementById("num3").value),
+                parseInt(document.getElementById("num4").value),
+                parseInt(document.getElementById("num5").value)
+            ];
+
+            if (numbers.every(num => num >= 1 && num <= 36 && !isNaN(num))) {
+                numbers.forEach(num => numberStages[num] = stage);
+                stagesData.push({ stage: stage, numbers: numbers });
+                updateStageTable();
+                updateLostStars();
+                stage++;
+                document.getElementById("stage").textContent = stage;
+                showNotification(isArabic ? "تم جمع النجوم بنجاح!" : "Stars collected successfully!");
+                clearInputs();
+            } else {
+                document.getElementById("result").textContent = isArabic ? 
+                    "أدخل 5 نجوم بين 1 و36!" : 
+                    "Enter 5 stars between 1 and 36!";
+            }
+        }
+
+        function prevStage() {
+            if (stage <= 1 || stagesData.length === 0) {
+                document.getElementById("result").textContent = isArabic ? 
+                    "لا يمكن العودة إلى المحطة الأولى!" : 
+                    "Cannot return to the first station!";
+                return;
+            }
+
+            stagesData.pop();
+            stage--;
+            numberStages = {};
+            stagesData.forEach(data => data.numbers.forEach(num => numberStages[num] = data.stage));
+            document.getElementById("stage").textContent = stage;
+            updateStageTable();
+            updateLostStars();
+            showNotification(isArabic ? "تم العودة إلى محطة سابقة!" : "Returned to a previous station!");
+            clearInputs();
+        }
+
+        function updateStageTable() {
+            const tbody = document.getElementById("stageNumbers");
+            tbody.innerHTML = "";
+            if (stagesData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="p-2">${isArabic ? "لم تُجمع نجوم بعد" : "No stars collected yet"}</td></tr>`;
+                return;
+            }
+            stagesData.forEach(data => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-2">${data.stage}</td>
+                    <td class="p-2">${data.numbers.join(" ✦ ")}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateLostStars() {
+            let lostStars = [];
+            for (let num = 1; num <= 36; num++) {
+                const lastStage = numberStages[num] !== undefined ? numberStages[num] : 0;
+                const lastDisplayed = lostStarsDisplayed[num] !== undefined ? lostStarsDisplayed[num] : 0;
+                if (stage - lastStage >= 60 && (lastDisplayed === 0 || stage - lastDisplayed >= 60)) {
+                    lostStars.push(num);
+                    lostStarsDisplayed[num] = stage;
+                }
+            }
+            document.getElementById("lostStars").textContent = lostStars.length > 0 ? 
+                lostStars.join(" ✦ ") : 
+                (isArabic ? "لا توجد نجوم ضائعة حاليًا" : "No stars lost yet");
+        }
+
+        function clearInputs() {
+            document.getElementById("num1").value = "";
+            document.getElementById("num2").value = "";
+            document.getElementById("num3").value = "";
+            document.getElementById("num4").value = "";
+            document.getElementById("num5").value = "";
+            document.getElementById("result").textContent = "";
+        }
+
+        function resetGame() {
+            stage = 1;
+            stagesData = [];
+            numberStages = {};
+            lostStarsDisplayed = {};
+            document.getElementById("stage").textContent = stage;
+            updateStageTable();
+            updateLostStars();
+            showNotification(isArabic ? "تم إعادة الرحلة الفضائية!" : "Space journey relaunched!");
+            clearInputs();
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById("notification");
+            notification.textContent = message;
+            notification.style.display = "block";
+            setTimeout(() => notification.style.display = "none", 1500); // تقليل زمن الإشعار إلى 1.5 ثانية
+        }
+
+        function scrollToLogs() {
+            const logs = document.getElementById("spaceLog");
+            logs.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        toggleLanguage();
+    </script>
+</body>
+</html>
